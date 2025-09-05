@@ -36,5 +36,28 @@ async function updateProduct(req: Request, res: Response) {
     }
 }
 
-const productController = {saveProduct, deleteProduct, updateProduct};
+async function getProductbyid(req: Request, res: Response) {
+    try {
+        console.log(req.params.id);
+        await Product.findById(req.params.id);
+        return res.status(200).json({ message: "Product fetched successfully." });
+       
+    } catch (error) {
+         console.error("Error getting product:", error);
+    return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+async function getAllProducts(req: Request, res: Response) {
+    try {
+        const products = await Product.find(); 
+        return res.status(200).json(products);
+    } catch (error) {
+        console.error("Error getting products:", error);
+        return res.status(500).json({ error: "Internal server error." });
+    }
+}
+
+
+const productController = {saveProduct, deleteProduct, updateProduct, getProductbyid, getAllProducts};
 export default productController;
