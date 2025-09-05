@@ -24,17 +24,12 @@ async function saveCartItem(req: Request, res: Response) {
 
     // Check if item already exists in cart
     const existingItem = await CartItem.findOne({ productId });
-    if (existingItem) {
-      existingItem.quantity += quantity;
-      await existingItem.save();
-      const subtotal = product.price * existingItem.quantity;
-      
-      return res.status(200).json({ 
-        success: true, 
-        data: { ...existingItem.toObject(), subtotal },
-        message: "Cart item updated successfully" 
-      });
-    }
+if (existingItem) {
+  return res.status(400).json({ 
+    success: false, 
+    message: "Product is already in cart. You can edit the quantity from your cart." 
+  });
+}
 
     const newCartItem = await CartItem.create({ productId, quantity });
     const subtotal = product.price * quantity;
@@ -145,5 +140,33 @@ async function deleteCartItem(req: Request, res: Response) {
   }
 }
 
-const cartController = { saveCartItem, deleteCartItem, updateCartItem, getAllCartItems };
+async function getCartItemById(req: Request, res: Response) {
+  try {
+    const { id } = req.params;
+    const cartItem = await CartItem.findById(id).populate("productId");
+
+    if (!cartItem) {
+      return res.status(404).json({
+        success: false,
+        message: "Cart item not found",
+      });
+    }
+
+    const product = cartItem.productId as any;
+    const subtotal = product.price * cartItem.quantity;
+
+    return res.status(200).json({
+      success: true,
+      data: { ...cartItem.toObject(), subtotal },
+    });
+  } catch (error) {
+    console.error("Error getting cart item:", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+}
+
+const cartController = { saveCartItem, deleteCartItem, updateCartItem, getAllCartItems, getCartItemById };
 export default cartController;
