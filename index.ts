@@ -3,7 +3,7 @@ import productRouter from "./src/routes/productRoutes"
 import cartRoutes from "./src/routes/cartRoutes"  
 import mongoose from "mongoose"
 import orderRoutes from "./src/routes/orderRoutes"
-const port = 7000
+const port = process.env.PORT || 7000;
 const app = express()
 app.use(express.json())
 
@@ -18,7 +18,12 @@ app.use(express.json())
 
 
 
-mongoose.connect("mongodb+srv://Julie:Bazera@cluster0.mkw79iu.mongodb.net/e-commerce")
+if (!process.env.MONGO_URI) {
+  throw new Error("MONGO_URI is not defined in environment variables");
+}
+
+mongoose
+  .connect(process.env.MONGO_URI)
   .then(()=>{
     console.log("well connected")
      app.listen(port ,()=>{
