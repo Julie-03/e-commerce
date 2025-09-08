@@ -1,3 +1,5 @@
+import dotenv from "dotenv";
+dotenv.config();
 import express from "express"
 import productRouter from "./src/routes/productRoutes"
 import cartRoutes from "./src/routes/cartRoutes"  
