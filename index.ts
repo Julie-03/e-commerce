@@ -10,15 +10,22 @@ const app = express()
 app.use(express.json())
 
 
+app.get("/", (req, res) => {
+  res.json({
+    message: "E-commerce API is running successfully!",
+    status: "active",
+    endpoints: {
+      products: "/products",
+      cart: "/cart", 
+      orders: "/order"
+    },
+    timestamp: new Date().toISOString()
+  });
+});
 
-
-
-
-  app.use("/products",productRouter)
-  app.use("/cart", cartRoutes);
-  app.use("/order", orderRoutes);
-
-
+app.use("/products", productRouter)
+app.use("/cart", cartRoutes);
+app.use("/order", orderRoutes)
 
 if (!process.env.MONGO_URI) {
   throw new Error("MONGO_URI is not defined in environment variables");
