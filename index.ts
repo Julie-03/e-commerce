@@ -5,7 +5,7 @@ import productRouter from "./src/routes/productRoutes"
 import cartRoutes from "./src/routes/cartRoutes"  
 import mongoose from "mongoose"
 import orderRoutes from "./src/routes/orderRoutes"
-const port = process.env.PORT || 7000;
+const port = parseInt(process.env.PORT || "7000", 10);
 const app = express()
 app.use(express.json())
 
@@ -25,10 +25,10 @@ if (!process.env.MONGO_URI) {
 }
 
 mongoose
-  .connect(process.env.MONGO_URI)
+  .connect(process.env.MONGO_URI as string)
   .then(()=>{
     console.log("well connected")
-     app.listen(port ,()=>{
+     app.listen(port, "0.0.0.0", ()=>{
   console.log(`your server is up and running on port : ${port}`)
 })
   })
