@@ -1,14 +1,27 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express"
+import cors from "cors"
 import productRouter from "./src/routes/productRoutes"
 import cartRoutes from "./src/routes/cartRoutes"  
 import mongoose from "mongoose"
 import orderRoutes from "./src/routes/orderRoutes"
+import userRouter from "./src/routes/userRoutes";
 const port = parseInt(process.env.PORT || "7000", 10);
 const app = express()
 app.use(express.json())
-
+// Configure CORS
+const allowedOrigin = process.env.CORS_ORIGIN || "*"
+app.use(cors({
+  origin: allowedOrigin,
+  credentials: true,
+  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}))
+app.use((req, res, next)=>{
+  console.log(`${req.method} - ${req.url} -`);
+  next()
+})
 
 app.get("/", (req, res) => {
   res.json({
@@ -23,9 +36,10 @@ app.get("/", (req, res) => {
   });
 });
 
-app.use("/products", productRouter)
+app.use("/products", productRouter);
 app.use("/cart", cartRoutes);
-app.use("/order", orderRoutes)
+app.use("/order", orderRoutes);
+app.use("/api_v1/user", userRouter);
 
 if (!process.env.MONGO_URI) {
   throw new Error("MONGO_URI is not defined in environment variables");
