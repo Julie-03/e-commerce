@@ -9,12 +9,18 @@ export const requireSignin = async (
 ) => {
   try {
     if (req.headers.authorization) {
-      const token = req.headers.authorization;
+      const authHeader = req.headers.authorization;
+      const token = authHeader.startsWith('Bearer ') 
+        ? authHeader.split(' ')[1] 
+        : authHeader;
+        
       const verifytoken: any = jwt.verify(token, JWT_SECRET);
+      
       const rootuser = await User.findOne({
-        _id: verifytoken._id,
-        "tokens.token": token,
+        _id: verifytoken._id,  // Changed from verifytoken.id to verifytoken._id
+        accessToken: token
       });
+      
       if (!rootuser) {
         throw "User not found";
       }

@@ -5,6 +5,7 @@ import Product from "../model/productModel";
 async function saveCartItem(req: Request, res: Response) {
   try {
     const { productId, quantity } = req.body;
+    const userId = (req as any).user._id;
     
     if (!productId || !quantity) {
       return res.status(400).json({ 
@@ -13,7 +14,6 @@ async function saveCartItem(req: Request, res: Response) {
       });
     }
 
-    // Check if product exists
     const product = await Product.findById(productId);
     if (!product) {
       return res.status(404).json({ 
@@ -22,16 +22,15 @@ async function saveCartItem(req: Request, res: Response) {
       });
     }
 
-    // Check if item already exists in cart
-    const existingItem = await CartItem.findOne({ productId });
-if (existingItem) {
-  return res.status(400).json({ 
-    success: false, 
-    message: "Product is already in cart. You can edit the quantity from your cart." 
-  });
-}
+    const existingItem = await CartItem.findOne({ userId, productId });
+    if (existingItem) {
+      return res.status(400).json({ 
+        success: false, 
+        message: "Product is already in cart. You can edit the quantity from your cart." 
+      });
+    }
 
-    const newCartItem = await CartItem.create({ productId, quantity });
+    const newCartItem = await CartItem.create({ userId, productId, quantity });
     const subtotal = product.price * quantity;
     
     return res.status(201).json({ 
@@ -50,9 +49,9 @@ if (existingItem) {
 
 async function getAllCartItems(req: Request, res: Response) {
   try {
-    const cartItems = await CartItem.find().populate('productId');
+    const userId = (req as any).user._id;
+    const cartItems = await CartItem.find({ userId }).populate('productId');
     
-    // Calculate subtotal for each item
     const itemsWithSubtotal = cartItems.map(item => {
       const product = item.productId as any;
       const subtotal = product.price * item.quantity;
@@ -76,6 +75,7 @@ async function updateCartItem(req: Request, res: Response) {
   try {
     const { productId } = req.params;
     const { quantity } = req.body;
+    const userId = (req as any).user._id;
 
     if (!quantity || quantity < 1) {
       return res.status(400).json({ 
@@ -85,7 +85,7 @@ async function updateCartItem(req: Request, res: Response) {
     }
 
     const cartItem = await CartItem.findOneAndUpdate(
-      { productId }, 
+      { userId, productId }, 
       { quantity }, 
       { new: true }
     ).populate('productId');
@@ -117,8 +117,9 @@ async function updateCartItem(req: Request, res: Response) {
 async function deleteCartItem(req: Request, res: Response) {
   try {
     const { productId } = req.params;
+    const userId = (req as any).user._id;
     
-    const cartItem = await CartItem.findOneAndDelete({ productId });
+    const cartItem = await CartItem.findOneAndDelete({ userId, productId });
     
     if (!cartItem) {
       return res.status(404).json({ 
@@ -143,7 +144,8 @@ async function deleteCartItem(req: Request, res: Response) {
 async function getCartItemById(req: Request, res: Response) {
   try {
     const { id } = req.params;
-    const cartItem = await CartItem.findById(id).populate("productId");
+    const userId = (req as any).user._id;
+    const cartItem = await CartItem.findOne({ _id: id, userId }).populate("productId");
 
     if (!cartItem) {
       return res.status(404).json({

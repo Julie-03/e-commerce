@@ -1,12 +1,19 @@
-import express from 'express';
-const cartRoutes = express.Router();
-import cartController from '../controllers/cartControllers';
-const { saveCartItem, deleteCartItem, updateCartItem, getAllCartItems, getCartItemById } = cartController;
+import express from "express";
+import { requireSignin } from "../middleware/authenticationFunction"; // Adjust path as needed
+import cartController from "../controllers/cartControllers"; // Default import
 
-cartRoutes.post('/', saveCartItem);
-cartRoutes.get('/', getAllCartItems);
-cartRoutes.put('/:productId', updateCartItem);
-cartRoutes.delete('/:productId', deleteCartItem);
-cartRoutes.get('/:id', getCartItemById);
+const cartRouter = express.Router();
 
-export default cartRoutes;
+// Apply authentication middleware to protect these routes
+cartRouter.post("/add", requireSignin, cartController.saveCartItem);
+cartRouter.get("/", requireSignin, cartController.getAllCartItems);
+cartRouter.get("/:id", requireSignin, cartController.getCartItemById);
+cartRouter.put("/update/:productId", requireSignin, cartController.updateCartItem);
+cartRouter.delete("/remove/:productId", requireSignin, cartController.deleteCartItem);
+
+// Test route (public)
+cartRouter.get("/test", (req, res) => {
+    res.json({ message: "Cart router is working!" });
+});
+
+export default cartRouter;
