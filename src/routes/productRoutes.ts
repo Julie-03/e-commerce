@@ -1,7 +1,7 @@
 import express from 'express';
 const productRouter = express.Router();
 import productController from '../controllers/productController';
-import { get } from 'mongoose';
+
 const { saveProduct, deleteProduct, updateProduct, getProductbyid, getAllProducts} = productController;
 
 
