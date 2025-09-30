@@ -7,6 +7,8 @@ import cartRoutes from "./src/routes/cartRoutes"
 import mongoose from "mongoose"
 import orderRoutes from "./src/routes/orderRoutes"
 import userRouter from "./src/routes/userRoutes";
+import contactRouter from "./src/routes/contactRoutes";
+
 const port = parseInt(process.env.PORT || "7000", 10);
 const app = express()
 app.use(express.json())
@@ -40,6 +42,7 @@ app.use("/products", productRouter);
 app.use("/cart", cartRoutes);
 app.use("/order", orderRoutes);
 app.use("/api_v1/user", userRouter);
+app.use("/api_v1/contact", contactRouter);
 
 if (!process.env.MONGO_URI) {
   throw new Error("MONGO_URI is not defined in environment variables");

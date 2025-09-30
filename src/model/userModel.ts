@@ -6,6 +6,8 @@ export interface Iuser extends Document{
     password: string;
     accessToken: string;
     userRole: string;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
 }
 
 const userSchema = new Schema<Iuser>({
@@ -13,7 +15,9 @@ const userSchema = new Schema<Iuser>({
     email: {type: String, required: true, unique: true},
     password: {type: String, required: true},
     accessToken: {type: String},
-    userRole: {enum: ['user', 'admin'], default: 'user', type: String}
+    userRole: {enum: ['user', 'admin'], default: 'user', type: String},
+    resetPasswordToken: {type: String},
+    resetPasswordExpires: {type: Date}
 }, {timestamps: true})
 
 export const User = model<Iuser>("User", userSchema)
