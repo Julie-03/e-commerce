@@ -10,6 +10,7 @@ cartRouter.get("/", requireSignin, cartController.getAllCartItems);
 cartRouter.get("/:id", requireSignin, cartController.getCartItemById);
 cartRouter.put("/update/:productId", requireSignin, cartController.updateCartItem);
 cartRouter.delete("/remove/:productId", requireSignin, cartController.deleteCartItem);
+cartRouter.delete("/clear", requireSignin, cartController.clearCart);
 
 // Test route (public)
 cartRouter.get("/test", (req, res) => {

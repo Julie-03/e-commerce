@@ -169,6 +169,24 @@ async function getCartItemById(req: Request, res: Response) {
     });
   }
 }
+async function clearCart(req: Request, res: Response) {
+  try {
+    const userId = (req as any).user._id;
+    const result = await CartItem.deleteMany({ userId });
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: "Cart cleared successfully",
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    console.error("Error clearing cart:", error);
+    return res.status(500).json({ 
+      success: false, 
+      message: "Internal server error" 
+    });
+  }
+}
 
-const cartController = { saveCartItem, deleteCartItem, updateCartItem, getAllCartItems, getCartItemById };
+const cartController = { saveCartItem,clearCart,deleteCartItem, updateCartItem, getAllCartItems, getCartItemById };
 export default cartController;

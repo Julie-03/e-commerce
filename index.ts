@@ -7,6 +7,8 @@ import cartRoutes from "./src/routes/cartRoutes"
 import mongoose from "mongoose"
 import orderRoutes from "./src/routes/orderRoutes"
 import userRouter from "./src/routes/userRoutes";
+import swaggerUi from 'swagger-ui-express';
+import swaggerDocument from './swagger.json';
 import contactRouter from "./src/routes/contactRoutes";
 
 const port = parseInt(process.env.PORT || "7000", 10);
@@ -33,6 +35,26 @@ app.get("/", (req, res) => {
       products: "/products",
       cart: "/cart", 
       orders: "/order"
+    },
+    timestamp: new Date().toISOString()
+  });
+});
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  customCss: '.swagger-ui .topbar { display: none }',
+  customSiteTitle: "E-Commerce API Docs"
+}));
+
+app.get("/", (req, res) => {
+  res.json({
+    message: "E-commerce API is running successfully!",
+    status: "active",
+    documentation: "/api-docs", // ✨ NEW: Add link to docs
+    endpoints: {
+      products: "/products",
+      cart: "/cart", 
+      orders: "/order",
+      users: "/api_v1/user",
+      contact: "/api_v1/contact"
     },
     timestamp: new Date().toISOString()
   });
