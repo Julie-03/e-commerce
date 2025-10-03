@@ -15,13 +15,25 @@ const port = parseInt(process.env.PORT || "7000", 10);
 const app = express()
 app.use(express.json())
 // Configure CORS
-const allowedOrigin = process.env.CORS_ORIGIN || "*"
+const allowedOrigins = process.env.CORS_ORIGIN 
+  ? process.env.CORS_ORIGIN.split(',') 
+  : ["*"];
+
 app.use(cors({
-  origin: allowedOrigin,
+  origin: function(origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
   methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
   allowedHeaders: ["Content-Type", "Authorization"]
-}))
+}));
 app.use((req, res, next)=>{
   console.log(`${req.method} - ${req.url} -`);
   next()
